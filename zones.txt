@@ -1,0 +1,11 @@
+# Zones swept by search_rooms.py --zones-file zones.txt
+bts-เสนานิคม
+bts-ม-เกษตรศาสตร์
+bts-พหลโยธิน-24
+bts-หมอชิต
+bts-สะพานควาย
+bts-อารีย์
+bts-ห้าแยกลาดพร้าว
+mrt-โชคชัย-4
+mrt-ลาดพร้าว
+ม-ราชภัฏจันทรเกษม
