@@ -36,7 +36,14 @@ __LEAFLET_CSS__
   #panel { position:absolute; z-index:500; top:12px; left:12px; width:290px; max-height:calc(100% - 24px);
     overflow:auto; background:var(--panel); border:1px solid var(--line); border-radius:10px;
     padding:14px; backdrop-filter:blur(6px); box-shadow:0 4px 20px rgba(0,0,0,.14); }
-  h1 { margin:0 0 2px; font-size:15px; }
+  #phead { display:flex; align-items:center; gap:8px; }
+  h1 { margin:0; font-size:15px; flex:1; }
+  #toggle { margin:0; width:auto; padding:3px 10px; font-size:12px; flex:none; }
+  #panel.collapsed { padding:10px 14px; }
+  #panel.collapsed #pbody { display:none; }
+  @media (max-width:600px) {
+    #panel { top:8px; left:8px; right:8px; width:auto; max-height:calc(100% - 16px); }
+  }
   .sub { color:var(--muted); font-size:12px; margin-bottom:12px; }
   label { display:block; font-size:12px; color:var(--muted); margin:10px 0 3px; }
   .row { display:flex; gap:8px; }
@@ -45,7 +52,7 @@ __LEAFLET_CSS__
   input[type=number] { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:6px;
     background:var(--bg); color:var(--fg); font-size:13px; }
   .chk { display:flex; align-items:center; gap:6px; margin-top:12px; font-size:13px; color:var(--fg); }
-  #count { margin-top:12px; padding-top:10px; border-top:1px solid var(--line); font-size:13px; }
+  #count { margin-top:6px; font-size:13px; }
   #count b { font-size:17px; }
   .legend { margin-top:10px; font-size:11px; color:var(--muted); }
   .legend span { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; }
@@ -64,8 +71,10 @@ __LEAFLET_CSS__
 <body>
 <div id="map"></div>
 <div id="panel">
-  <h1>__TITLE__</h1>
-  <div class="sub">__SUBTITLE__</div>
+  <div id="phead"><h1>__TITLE__</h1><button id="toggle" aria-expanded="true">ซ่อน</button></div>
+  <div id="count"></div>
+  <div id="pbody">
+  <div class="sub" style="margin-top:6px">__SUBTITLE__</div>
   <label>โซน</label>
   <select id="zone"><option value="">ทุกโซน</option>__ZONE_OPTIONS__</select>
   <label>ขนาดห้อง (ตร.ม.)</label>
@@ -76,7 +85,6 @@ __LEAFLET_CSS__
   <div class="row"><input type="number" id="dmax" placeholder="เช่น 800" step="100"></div>
   <label class="chk"><input type="checkbox" id="avail" checked> ห้องว่างเท่านั้น</label>
   <label class="chk"><input type="checkbox" id="nosize"> รวมห้องที่ไม่ระบุขนาด</label>
-  <div id="count"></div>
   <div class="legend">
     <div><span style="background:#2e9e5b"></span>&lt; 6,000 &nbsp;
          <span style="background:#e0a92b"></span>6,000-9,000 &nbsp;
@@ -84,6 +92,7 @@ __LEAFLET_CSS__
     <div style="margin-top:4px">ขนาดวงกลม = จำนวนห้องที่ตรงเงื่อนไข</div>
   </div>
   <button id="reset">รีเซ็ตมุมมอง</button>
+  </div>
 </div>
 <script>
 const DATA = __DATA__;
@@ -184,6 +193,16 @@ for (const id of ['smin','smax','pmin','pmax','dmax'])
 for (const id of ['avail','nosize','zone']) el(id).addEventListener('change', render);
 L.control.scale({imperial:false}).addTo(map);
 el('reset').addEventListener('click', () => map.setView(CENTER, __ZOOM__));
+const panel = el('panel'), toggle = el('toggle');
+const narrow = () => window.matchMedia('(max-width:600px)').matches;
+function setCollapsed(c) {
+  panel.classList.toggle('collapsed', c);
+  toggle.textContent = c ? 'ตัวกรอง' : 'ซ่อน';
+  toggle.setAttribute('aria-expanded', String(!c));
+}
+toggle.addEventListener('click', () => setCollapsed(!panel.classList.contains('collapsed')));
+map.on('click', () => { if (narrow()) setCollapsed(true); });
+setCollapsed(narrow());
 render();
 </script>
 </body>
